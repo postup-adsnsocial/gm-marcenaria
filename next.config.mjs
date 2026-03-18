@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
+    unoptimized: true, // <-- A mágica que salva a CPU do Cloudflare entra aqui
     remotePatterns: [
       {
         protocol: 'https',

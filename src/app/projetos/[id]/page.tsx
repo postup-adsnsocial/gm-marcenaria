@@ -12,6 +12,7 @@ import { Project } from '../../../types/project';
 import { mockProjects } from '../../../data/mock';
 import { supabase } from '../../../lib/supabase';
 import { parseImageUrls } from '../../../components/ProjectCard';
+import Link from 'next/link';
 
 export default function ProjectPage() {
   const params = useParams();
@@ -114,14 +115,14 @@ export default function ProjectPage() {
       
       <div className="flex-1 pt-48 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
-          {/* Back button */}
-          <button 
-            onClick={() => router.push('/#portfolio')}
+         {/* Back button */}
+         <Link 
+            href="/#portfolio"
             className="flex items-center gap-2 text-neutral hover:text-secondary transition-colors mb-8 group"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="text-sm font-medium uppercase tracking-wider">Voltar ao Portfólio</span>
-          </button>
+          </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
             {/* Image Gallery */}
