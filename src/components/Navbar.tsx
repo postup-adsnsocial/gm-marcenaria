@@ -33,7 +33,7 @@ export default function Navbar() {
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <a href="/" className={`font-serif text-2xl tracking-wide transition-colors duration-300 ${scrolled || isMenuOpen ? 'text-secondary' : 'text-white drop-shadow-md'}`}>
-            G&M <span className="font-light">Móveis</span>
+          <img src="/logo-gm.png" alt="G&M Móveis" className="h-10 w-auto" />
           </a>
           
           {/* Desktop Nav */}
