@@ -112,7 +112,7 @@ export default function ProjectPage() {
     <main className="min-h-screen bg-primary flex flex-col">
       <Navbar />
       
-      <div className="flex-1 pt-24 pb-16 px-4">
+      <div className="flex-1 pt-48 pb-16 px-4">
         <div className="max-w-6xl mx-auto">
           {/* Back button */}
           <button 

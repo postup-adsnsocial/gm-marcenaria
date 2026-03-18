@@ -16,8 +16,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "G&M Móveis | Marcenaria de Luxo",
-  description: "Transformamos ambientes em experiências. Há mais de três décadas criando móveis exclusivos e sob medida.",
+  title: "G&M Móveis | Móveis Planejados",
+  description: "Marcenaria de alto padrão para projetos exclusivos. Há mais de três décadas criando móveis sob medida.",
 };
 
 export default function RootLayout({

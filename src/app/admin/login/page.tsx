@@ -70,7 +70,7 @@ export default function AdminLoginPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="font-serif text-4xl text-secondary mb-2 hover:text-accent transition-colors block">
-          <img src="/logo-gm.png" alt="G&M Móveis" className="h-16 w-auto mx-auto mb-6" />
+          <img src="/logo-gm.png" alt="G&M Móveis" className="h-64 w-auto mx-auto mb-6" />
           </Link>
           <p className="text-neutral">Painel Administrativo</p>
         </div>
