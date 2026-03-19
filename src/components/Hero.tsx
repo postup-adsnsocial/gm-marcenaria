@@ -49,7 +49,7 @@ export default function Hero() {
           transition={{ duration: 0.9, delay: 0.4, ease: "easeOut" }}
           className="font-sans text-lg md:text-xl text-white/90 mb-10 font-light tracking-wide drop-shadow-md"
         >
-          Há mais de três décadas criando móveis exclusivos
+          Há mais de três décadas criando móveis planejados
         </motion.p>
 
         <motion.div 
