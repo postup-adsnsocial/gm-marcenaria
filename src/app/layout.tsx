@@ -3,20 +3,20 @@ import { Inter, Playfair_Display } from "next/font/google";
 import { Toaster } from "sonner";
 import "../index.css";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: '--font-inter',
   display: 'swap',
 });
 
-const playfair = Playfair_Display({ 
+const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: '--font-playfair',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "G&M Móveis | Móveis Planejados",
+  title: "GM Marcenaria | Móveis Planejados",
   description: "Marcenaria de alto padrão para projetos exclusivos. Há mais de três décadas criando móveis sob medida.",
 };
 

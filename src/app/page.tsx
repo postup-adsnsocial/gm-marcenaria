@@ -71,9 +71,9 @@ export default function Home() {
         <Differentials />
       </div>
 
-      <section id="portfolio" className="py-32 px-4 bg-white">
+      <section id="portfolio" className="py-16 md:py-32 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-20 gap-6">
             <div className="max-w-2xl">
               <motion.span 
                 initial={{ opacity: 0, y: 10 }}
@@ -88,7 +88,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
-                className="font-serif text-5xl md:text-6xl text-secondary leading-tight"
+                className="font-serif text-4xl md:text-5xl lg:text-6xl text-secondary leading-tight"
               >
                 Portfólio de <br />
                 <span className="italic">Projetos Selecionados</span>

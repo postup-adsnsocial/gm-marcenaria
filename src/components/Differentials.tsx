@@ -29,7 +29,7 @@ const values = [
 
 export default function Differentials() {
   return (
-    <section id="sobre" className="py-32 bg-white px-6 overflow-hidden">
+    <section id="sobre" className="py-16 md:py-32 bg-white px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
           
@@ -42,7 +42,7 @@ export default function Differentials() {
               transition={{ duration: 0.8 }}
             >
               <span className="font-sans text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-6 block">Nossa Essência</span>
-              <h2 className="font-serif text-5xl md:text-6xl text-secondary leading-[1.1] tracking-tight mb-8">
+              <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-secondary leading-[1.1] tracking-tight mb-8">
                 Onde o <span className="italic">design</span> encontra a alma da madeira.
               </h2>
               <p className="font-sans text-xl text-secondary/70 font-light leading-relaxed max-w-2xl">
@@ -79,7 +79,7 @@ export default function Differentials() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-primary p-12 md:p-16 relative"
+              className="bg-primary p-8 md:p-16 relative"
             >
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Trophy className="w-32 h-32 text-secondary" />

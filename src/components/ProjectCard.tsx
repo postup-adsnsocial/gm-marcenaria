@@ -74,7 +74,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           ref={scrollContainerRef}
           className="flex w-full h-full overflow-x-auto snap-x snap-mandatory hide-scrollbar"
           onScroll={handleScroll}
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', touchAction: 'pan-x' }}
         >
           {items.map((item, idx) => (
             <div
@@ -126,13 +126,13 @@ export default function ProjectCard({ project }: ProjectCardProps) {
           <>
             <button
               onClick={(e) => scrollToItem(Math.max(0, currentIndex - 1), e)}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white shadow-sm hover:bg-white hover:text-secondary transition-all ${currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
+              className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white shadow-sm hover:bg-white hover:text-secondary transition-all hidden md:block ${currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={(e) => scrollToItem(Math.min(items.length - 1, currentIndex + 1), e)}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white shadow-sm hover:bg-white hover:text-secondary transition-all ${currentIndex === items.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white shadow-sm hover:bg-white hover:text-secondary transition-all hidden md:block ${currentIndex === items.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-0 group-hover:opacity-100'}`}
             >
               <ChevronRight className="w-4 h-4" />
             </button>

@@ -34,7 +34,7 @@ export default function AdminPage() {
             .select('role')
             .eq('user_id', session.user.id)
             .single();
-            
+
           if (roleData) {
             setUserRole(roleData.role as 'admin' | 'editor' | 'viewer');
           } else {
@@ -53,7 +53,7 @@ export default function AdminPage() {
         }
       }
     };
-    
+
     checkAuth();
   }, [router]);
 
@@ -65,18 +65,18 @@ export default function AdminPage() {
 
   useEffect(() => {
     let result = projects;
-    
+
     if (selectedCategory !== 'Todos') {
       result = result.filter(p => p.category === selectedCategory);
     }
-    
+
     if (searchTerm) {
-      result = result.filter(p => 
+      result = result.filter(p =>
         p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         p.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     setFilteredProjects(result);
   }, [searchTerm, selectedCategory, projects]);
 
@@ -88,9 +88,9 @@ export default function AdminPage() {
           .from('projects')
           .select('*')
           .order('created_at', { ascending: false });
-          
+
         if (error) throw error;
-        
+
         if (data && data.length > 0) {
           setProjects(data as Project[]);
         } else {
@@ -150,10 +150,10 @@ export default function AdminPage() {
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="font-serif text-xl sm:text-2xl text-secondary truncate mr-4 hover:text-accent transition-colors">
-            G&M Admin
+            GM Admin
           </Link>
           <div className="flex items-center gap-3 sm:gap-6">
-            <Link 
+            <Link
               href="/"
               target="_blank"
               className="flex items-center gap-2 text-neutral hover:text-accent transition-colors text-sm font-medium"
@@ -161,7 +161,7 @@ export default function AdminPage() {
               <Eye className="w-4 h-4" />
               <span className="hidden sm:inline">Ver Site</span>
             </Link>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-neutral hover:text-secondary transition-colors text-sm font-medium"
             >
@@ -234,7 +234,7 @@ export default function AdminPage() {
               {filteredProjects.map((project) => {
                 const images = parseImageUrls(project.image_url);
                 const mainImage = images.length > 0 ? images[0] : '';
-                
+
                 return (
                   <motion.div
                     key={project.id}
@@ -248,9 +248,9 @@ export default function AdminPage() {
                           isVideo(mainImage) ? (
                             <video src={mainImage} className="w-full h-full object-cover" />
                           ) : (
-                            <Image 
-                              src={mainImage} 
-                              alt={project.title} 
+                            <Image
+                              src={mainImage}
+                              alt={project.title}
                               fill
                               sizes="96px"
                               className="object-cover"
@@ -258,11 +258,11 @@ export default function AdminPage() {
                           )
                         )}
                       </div>
-                      
+
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-serif text-lg text-secondary mb-1 truncate">
+                        <Link href={`/projetos/${project.id}`} target="_blank" className="font-serif text-lg text-secondary mb-1 truncate block hover:text-accent transition-colors">
                           {project.title}
-                        </h3>
+                        </Link>
                         <span className="inline-block px-2 py-1 text-[9px] font-bold tracking-widest uppercase text-accent/70 bg-accent/5 rounded-sm mb-2">
                           {project.category}
                         </span>
@@ -271,7 +271,7 @@ export default function AdminPage() {
                         </p>
                       </div>
                     </div>
-                    
+
                     {(userRole === 'admin' || userRole === 'editor') && (
                       <div className="flex gap-2 px-4 py-3 bg-primary/10 border-t border-neutral/5">
                         <button
@@ -291,7 +291,7 @@ export default function AdminPage() {
                   </motion.div>
                 );
               })}
-              
+
               {filteredProjects.length === 0 && (
                 <div className="bg-white rounded-sm shadow-sm p-12 text-center">
                   <p className="font-serif text-lg text-neutral/30 italic">
@@ -319,9 +319,9 @@ export default function AdminPage() {
                     {filteredProjects.map((project) => {
                       const items = parseImageUrls(project.image_url);
                       const firstItem = items.length > 0 ? items[0] : '';
-                      
+
                       return (
-                        <motion.tr 
+                        <motion.tr
                           key={project.id}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
@@ -333,9 +333,9 @@ export default function AdminPage() {
                                 isVideo(firstItem) ? (
                                   <video src={firstItem} className="w-full h-full object-cover" />
                                 ) : (
-                                  <Image 
-                                    src={firstItem} 
-                                    alt={project.title} 
+                                  <Image
+                                    src={firstItem}
+                                    alt={project.title}
                                     fill
                                     sizes="80px"
                                     className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -345,7 +345,7 @@ export default function AdminPage() {
                             </div>
                           </td>
                           <td className="px-8 py-6">
-                            <div className="font-serif text-lg text-secondary mb-1">{project.title}</div>
+                            <Link href={`/projetos/${project.id}`} target="_blank" className="font-serif text-lg text-secondary mb-1 hover:text-accent transition-colors block">{project.title}</Link>
                             <div className="text-xs text-neutral/60 font-light truncate max-w-md">{project.description}</div>
                           </td>
                           <td className="px-8 py-6">

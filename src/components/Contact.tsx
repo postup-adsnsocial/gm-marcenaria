@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 
 export default function Contact() {
   return (
-    <section id="contato" className="py-40 bg-secondary text-white px-6 overflow-hidden relative">
+    <section id="contato" className="py-20 md:py-40 bg-secondary text-white px-6 overflow-hidden relative">
       {/* Elemento Decorativo */}
       <div className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-white rounded-full" />
@@ -22,7 +22,7 @@ export default function Contact() {
         >
           <span className="font-sans text-[11px] font-bold tracking-[0.4em] uppercase text-accent/60">Próximo Passo</span>
           
-          <h2 className="font-serif text-5xl md:text-7xl leading-tight tracking-tight">
+          <h2 className="font-serif text-4xl md:text-5xl lg:text-7xl leading-tight tracking-tight">
             Vamos materializar o <span className="italic">seu</span> projeto?
           </h2>
           
@@ -37,7 +37,7 @@ export default function Contact() {
               href="https://wa.me/5541999695577?text=Ol%C3%A1%2C%20gostaria%20de%20solicitar%20um%20or%C3%A7amento" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-4 px-16 py-6 bg-accent text-white font-sans text-sm font-bold tracking-[0.2em] uppercase hover:bg-accent/90 transition-all shadow-2xl group"
+              className="inline-flex items-center gap-4 px-10 md:px-16 py-5 md:py-6 bg-accent text-white font-sans text-sm font-bold tracking-[0.2em] uppercase hover:bg-accent/90 transition-all shadow-2xl group"
             >
               <MessageCircle className="w-5 h-5 transition-transform group-hover:rotate-12" />
               Fale Conosco

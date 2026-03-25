@@ -2,7 +2,7 @@ import { Instagram, Mail, Phone, AtSign, Music2, Pin } from 'lucide-react';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
-  
+
   return (
     <footer className="bg-white text-secondary py-20 px-6 border-t border-neutral/10">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
@@ -20,8 +20,8 @@ export default function Footer() {
             </a>
           </div>
           <div className="pt-4 space-y-1 font-sans text-lg font-light tracking-tight text-secondary/70">
-            <p>R. Camões, 556 — Alto da XV</p>
-            <p>Curitiba/PR, 80045-320</p>
+            <p>R. Rua Antenor Alves de Souza n. 110, Roça Grande</p>
+            <p>Colombo/PR, 83402-330</p>
           </div>
         </div>
 
@@ -50,7 +50,7 @@ export default function Footer() {
               { icon: Pin, href: '#' },
               { icon: Music2, href: '#' },
             ].map((social, idx) => (
-              <a 
+              <a
                 key={idx}
                 href={social.href}
                 target="_blank"
@@ -65,7 +65,7 @@ export default function Footer() {
       </div>
 
       <div className="max-w-7xl mx-auto mt-20 pt-8 border-t border-neutral/5 flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] font-bold tracking-[0.2em] uppercase text-secondary/30">
-        <p>&copy; {currentYear} G&M Móveis. Todos os direitos reservados.</p>
+        <p>&copy; {currentYear} GilMóveis Marcenaria. Todos os direitos reservados.</p>
         <p>Marcenaria de Luxo desde 1987</p>
       </div>
     </footer>

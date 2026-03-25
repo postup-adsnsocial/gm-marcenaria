@@ -43,7 +43,7 @@ export default function EditProjectPage() {
         fetchProject();
       }
     };
-    
+
     checkAuthAndFetch();
   }, [router, id]);
 
@@ -58,12 +58,12 @@ export default function EditProjectPage() {
           .select('*')
           .eq('id', id)
           .single();
-          
+
         if (error) {
           console.warn('Supabase fetch failed, falling back to mock:', error.message);
           throw error;
         }
-        
+
         if (data) {
           setProject(data as Project);
         } else {
@@ -100,7 +100,7 @@ export default function EditProjectPage() {
   const handleSaveProject = async (data: ProjectInput, files?: File[]) => {
     try {
       let imageUrls: string[] = [];
-      
+
       try {
         imageUrls = JSON.parse(data.image_url);
       } catch {
@@ -167,18 +167,18 @@ export default function EditProjectPage() {
       <header className="bg-white shadow-sm sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4 overflow-hidden">
-            <button 
+            <button
               onClick={() => router.push('/admin')}
               className="p-2 -ml-2 text-neutral hover:text-secondary hover:bg-neutral/5 rounded-full transition-colors flex-shrink-0"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <Link href="/" className="font-serif text-xl sm:text-2xl text-secondary truncate hover:text-accent transition-colors">
-              G&M Admin
+              GM Admin
             </Link>
           </div>
           <div className="flex items-center gap-4 sm:gap-6">
-            <Link 
+            <Link
               href="/"
               target="_blank"
               className="flex items-center gap-2 text-neutral hover:text-accent transition-colors text-sm font-medium"
@@ -186,7 +186,7 @@ export default function EditProjectPage() {
               <Eye className="w-4 h-4" />
               <span className="hidden sm:inline">Ver Site</span>
             </Link>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-neutral hover:text-secondary transition-colors text-sm font-medium flex-shrink-0"
             >
