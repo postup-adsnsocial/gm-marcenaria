@@ -63,14 +63,14 @@ export default function AdminLoginPage() {
 
   return (
     <div className="min-h-screen bg-primary flex flex-col justify-center items-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
         <div className="text-center mb-8">
           <Link href="/" className="font-serif text-4xl text-secondary mb-2 hover:text-accent transition-colors block">
-          <img src="/logo-gm.png" alt="G&M Móveis" className="h-64 w-auto mx-auto mb-6" />
+            <img src="/logo-gm.png" alt="GM Marcenaria" className="h-64 w-auto mx-auto mb-6" />
           </Link>
           <p className="text-neutral">Painel Administrativo</p>
         </div>
@@ -82,7 +82,7 @@ export default function AdminLoginPage() {
                 {error}
               </div>
             )}
-            
+
             <div>
               <label className="block text-sm font-medium text-secondary mb-2">
                 E-mail
@@ -119,7 +119,7 @@ export default function AdminLoginPage() {
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
-          
+
           {!supabase && (
             <div className="mt-6 p-4 bg-accent/10 rounded-sm text-sm text-accent text-center">
               <strong>Modo Mock Ativo:</strong><br />

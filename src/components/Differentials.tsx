@@ -32,7 +32,7 @@ export default function Differentials() {
     <section id="sobre" className="py-16 md:py-32 bg-white px-6 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-start">
-          
+
           {/* Coluna da Esquerda: Manifesto */}
           <div className="lg:col-span-7 space-y-12">
             <motion.div
@@ -46,13 +46,13 @@ export default function Differentials() {
                 Onde o <span className="italic">design</span> encontra a alma da madeira.
               </h2>
               <p className="font-sans text-xl text-secondary/70 font-light leading-relaxed max-w-2xl">
-                A G&M Móveis não apenas fabrica mobiliário; nós esculpimos experiências.
+                A GM Marcenaria não apenas fabrica mobiliário; nós esculpimos experiências.
               </p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pt-8">
               {values.map((value, idx) => (
-                <motion.div 
+                <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -84,9 +84,9 @@ export default function Differentials() {
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <Trophy className="w-32 h-32 text-secondary" />
               </div>
-              
+
               <h3 className="font-sans text-[11px] font-bold tracking-[0.3em] uppercase text-secondary/40 mb-12">Trajetória & Reconhecimento</h3>
-              
+
               <div className="space-y-12">
                 {recognitions.map((rec, idx) => (
                   <div key={idx} className="group relative">
