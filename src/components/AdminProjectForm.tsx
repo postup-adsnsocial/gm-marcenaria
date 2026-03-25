@@ -114,14 +114,22 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-2">Descriçāo</label>
+            <label className="block text-sm font-medium text-secondary mb-2">Descrição</label>
             <textarea
               required
-              rows={4}
+              rows={8}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2 border border-neutral/20 rounded-sm focus:outline-none focus:border-accent resize-none"
+              placeholder="Dica: Use parágrafos (tecla Enter) para uma leitura mais agradável."
+              className="w-full px-4 py-3 border border-neutral/20 rounded-sm focus:outline-none focus:border-accent resize-none font-light leading-relaxed mb-2"
             />
+            <div className="flex flex-wrap gap-4 text-[10px] text-neutral/50 uppercase tracking-widest font-medium">
+              <span>**Negrito**</span>
+              <span>*Itálico*</span>
+              <span>- Lista</span>
+              <span>1. Lista numerada</span>
+              <span>## Subtítulo</span>
+            </div>
           </div>
 
           <div>

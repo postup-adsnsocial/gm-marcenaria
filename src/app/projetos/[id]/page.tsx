@@ -13,6 +13,7 @@ import { mockProjects } from '../../../data/mock';
 import { supabase } from '../../../lib/supabase';
 import { parseImageUrls, isVideo } from '../../../components/ProjectCard';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 
 export default function ProjectPage() {
   const params = useParams();
@@ -235,10 +236,10 @@ export default function ProjectPage() {
                 <div className="w-16 h-px bg-accent/30 mb-8" />
               </div>
 
-              <div className="prose prose-neutral prose-lg max-w-none mb-12">
-                <p className="text-neutral leading-relaxed font-light">
+              <div className="prose prose-neutral prose-lg max-w-none mb-12 prose-p:text-neutral prose-p:leading-relaxed prose-p:font-light prose-headings:font-serif prose-headings:text-secondary prose-strong:text-secondary prose-strong:font-medium">
+                <ReactMarkdown>
                   {project.description}
-                </p>
+                </ReactMarkdown>
               </div>
 
               <div className="bg-white p-8 rounded-sm border border-neutral/10 shadow-sm">
