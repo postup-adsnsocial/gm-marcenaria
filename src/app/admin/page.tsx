@@ -11,7 +11,7 @@ import DeleteButton from '../../components/DeleteButton';
 import { Project } from '../../types/project';
 import { mockProjects, categories } from '../../data/mock';
 import { supabase } from '../../lib/supabase';
-import { parseImageUrls } from '../../components/ProjectCard';
+import { parseImageUrls, isVideo } from '../../components/ProjectCard';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -245,13 +245,17 @@ export default function AdminPage() {
                     <div className="flex gap-4 p-4">
                       <div className="w-24 h-24 flex-shrink-0 rounded-sm overflow-hidden bg-neutral/5 relative">
                         {mainImage && (
-                          <Image 
-                            src={mainImage} 
-                            alt={project.title} 
-                            fill
-                            sizes="96px"
-                            className="object-cover"
-                          />
+                          isVideo(mainImage) ? (
+                            <video src={mainImage} className="w-full h-full object-cover" />
+                          ) : (
+                            <Image 
+                              src={mainImage} 
+                              alt={project.title} 
+                              fill
+                              sizes="96px"
+                              className="object-cover"
+                            />
+                          )
                         )}
                       </div>
                       
@@ -313,8 +317,8 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="divide-y divide-neutral/5">
                     {filteredProjects.map((project) => {
-                      const images = parseImageUrls(project.image_url);
-                      const mainImage = images.length > 0 ? images[0] : '';
+                      const items = parseImageUrls(project.image_url);
+                      const firstItem = items.length > 0 ? items[0] : '';
                       
                       return (
                         <motion.tr 
@@ -325,14 +329,18 @@ export default function AdminPage() {
                         >
                           <td className="px-8 py-6 whitespace-nowrap">
                             <div className="w-20 h-20 rounded-sm overflow-hidden bg-neutral/5 relative shadow-sm group-hover:shadow-md transition-shadow">
-                              {mainImage && (
-                                <Image 
-                                  src={mainImage} 
-                                  alt={project.title} 
-                                  fill
-                                  sizes="80px"
-                                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                                />
+                              {firstItem && (
+                                isVideo(firstItem) ? (
+                                  <video src={firstItem} className="w-full h-full object-cover" />
+                                ) : (
+                                  <Image 
+                                    src={firstItem} 
+                                    alt={project.title} 
+                                    fill
+                                    sizes="80px"
+                                    className="object-cover group-hover:scale-110 transition-transform duration-700"
+                                  />
+                                )
                               )}
                             </div>
                           </td>

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Project, ProjectInput } from '../types/project';
 import { categories } from '../data/mock';
 import { Upload, X } from 'lucide-react';
-import { parseImageUrls } from './ProjectCard';
+import { parseImageUrls, isVideo } from './ProjectCard';
 import { toast } from 'sonner';
 
 interface AdminProjectFormProps {
@@ -125,38 +125,63 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-2">Imagens do Projeto</label>
+            <label className="block text-sm font-medium text-secondary mb-2">Mídias do Projeto (Imagens e Vídeos)</label>
             
             {/* Gallery Preview */}
             {(imageUrls.length > 0 || previews.length > 0) && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
                 {imageUrls.map((url, idx) => (
-                  <div key={`url-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-neutral/20">
-                    <Image src={url} alt={`Imagem ${idx + 1}`} fill className="object-cover" />
+                  <div key={`url-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-neutral/20 bg-black/5">
+                    {isVideo(url) ? (
+                      <video src={url} className="w-full h-full object-cover" />
+                    ) : (
+                      <Image src={url} alt={`Mídia ${idx + 1}`} fill className="object-cover" />
+                    )}
                     <button
                       type="button"
                       onClick={() => removeExistingUrl(idx)}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                      title="Remover imagem"
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                      title="Remover"
                     >
                       <X className="w-4 h-4" />
                     </button>
+                    {isVideo(url) && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
+                         <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
+                            <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
+                         </div>
+                      </div>
+                    )}
                   </div>
                 ))}
-                {previews.map((preview, idx) => (
-                  <div key={`file-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-accent/50">
-                    <Image src={preview} alt={`Nova imagem ${idx + 1}`} fill className="object-cover" />
-                    <div className="absolute inset-0 bg-accent/10 pointer-events-none" />
-                    <button
-                      type="button"
-                      onClick={() => removeNewFile(idx)}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                      title="Remover imagem"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+                {previews.map((preview, idx) => {
+                  const isVid = files[idx] ? files[idx].type.startsWith('video/') : isVideo(preview);
+                  return (
+                    <div key={`file-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-accent/50 bg-black/5">
+                      {isVid ? (
+                        <video src={preview} className="w-full h-full object-cover" />
+                      ) : (
+                        <Image src={preview} alt={`Novo item ${idx + 1}`} fill className="object-cover" />
+                      )}
+                      <div className="absolute inset-0 bg-accent/10 pointer-events-none" />
+                      <button
+                        type="button"
+                        onClick={() => removeNewFile(idx)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                        title="Remover"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                      {isVid && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
+                           <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
+                              <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
+                           </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
@@ -165,11 +190,11 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
                 <Upload className="mx-auto h-12 w-12 text-neutral/50 mb-4" />
                 <div className="flex text-sm text-neutral justify-center">
                   <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-accent hover:text-accent/80 focus-within:outline-none">
-                    <span>Fazer upload de imagens</span>
-                    <input id="file-upload" name="file-upload" type="file" multiple className="sr-only" accept="image/*" onChange={handleFileChange} />
+                    <span>Fazer upload de imagens e vídeos</span>
+                    <input id="file-upload" name="file-upload" type="file" multiple className="sr-only" accept="image/*,video/*" onChange={handleFileChange} />
                   </label>
                 </div>
-                <p className="text-xs text-neutral/70">Você pode selecionar várias imagens (PNG, JPG, GIF)</p>
+                <p className="text-xs text-neutral/70">Imagens (PNG, JPG) ou Vídeos (MP4, WEBM)</p>
               </div>
             </div>
             
@@ -178,7 +203,7 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
                 type="url"
                 value={urlInput}
                 onChange={(e) => setUrlInput(e.target.value)}
-                placeholder="Ou adicione uma URL de imagem (ex: https://images.unsplash.com/...)"
+                placeholder="Ou adicione uma URL (ex: https://...)"
                 className="flex-1 px-4 py-2 border border-neutral/20 rounded-sm focus:outline-none focus:border-accent"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {

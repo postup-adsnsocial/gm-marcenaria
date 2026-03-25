@@ -11,7 +11,7 @@ import WhatsAppButton from '../../../components/WhatsAppButton';
 import { Project } from '../../../types/project';
 import { mockProjects } from '../../../data/mock';
 import { supabase } from '../../../lib/supabase';
-import { parseImageUrls } from '../../../components/ProjectCard';
+import { parseImageUrls, isVideo } from '../../../components/ProjectCard';
 import Link from 'next/link';
 
 export default function ProjectPage() {
@@ -21,7 +21,7 @@ export default function ProjectPage() {
   
   const [project, setProject] = useState<Project | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     async function fetchProject() {
@@ -102,7 +102,7 @@ export default function ProjectPage() {
     );
   }
 
-  const images = parseImageUrls(project.image_url);
+  const items = parseImageUrls(project.image_url);
 
   const handleWhatsAppClick = () => {
     const message = encodeURIComponent(`Olá! Gostaria de solicitar um orçamento inspirado no projeto: ${project.title} (${project.category}).`);
@@ -125,7 +125,7 @@ export default function ProjectPage() {
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            {/* Image Gallery */}
+            {/* Image/Video Gallery */}
             <motion.div 
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -135,37 +135,49 @@ export default function ProjectPage() {
               <div className="relative aspect-[4/3] sm:aspect-video lg:aspect-[4/5] overflow-hidden rounded-sm bg-neutral-100">
                 <AnimatePresence mode="wait">
                   <motion.div
-                    key={currentImageIndex}
+                    key={currentIndex}
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="absolute inset-0"
                   >
-                    <Image 
-                      src={images[currentImageIndex]} 
-                      alt={`${project.title} - Foto ${currentImageIndex + 1}`}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      className="object-cover"
-                      priority
-                    />
+                    {isVideo(items[currentIndex]) ? (
+                      <video 
+                        src={items[currentIndex]}
+                        className="w-full h-full object-cover"
+                        controls
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                      />
+                    ) : (
+                      <Image 
+                        src={items[currentIndex]} 
+                        alt={`${project.title} - Item ${currentIndex + 1}`}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                        className="object-cover"
+                        priority
+                      />
+                    )}
                   </motion.div>
                 </AnimatePresence>
                 
-                {images.length > 1 && (
+                {items.length > 1 && (
                   <>
                     <button 
-                      onClick={() => setCurrentImageIndex(prev => Math.max(0, prev - 1))}
-                      className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white transition-all ${currentImageIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 hover:scale-125 active:scale-95'}`}
-                      disabled={currentImageIndex === 0}
+                      onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                      className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white transition-all ${currentIndex === 0 ? 'opacity-0 pointer-events-none' : 'opacity-100 hover:scale-125 active:scale-95'}`}
+                      disabled={currentIndex === 0}
                     >
                       <ChevronLeft className="w-8 h-8 sm:w-10 h-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                     </button>
                     <button 
-                      onClick={() => setCurrentImageIndex(prev => Math.min(images.length - 1, prev + 1))}
-                      className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white transition-all ${currentImageIndex === images.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 hover:scale-125 active:scale-95'}`}
-                      disabled={currentImageIndex === images.length - 1}
+                      onClick={() => setCurrentIndex(prev => Math.min(items.length - 1, prev + 1))}
+                      className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-10 p-2 text-white transition-all ${currentIndex === items.length - 1 ? 'opacity-0 pointer-events-none' : 'opacity-100 hover:scale-125 active:scale-95'}`}
+                      disabled={currentIndex === items.length - 1}
                     >
                       <ChevronRight className="w-8 h-8 sm:w-10 h-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                     </button>
@@ -174,21 +186,32 @@ export default function ProjectPage() {
               </div>
 
               {/* Thumbnails */}
-              {images.length > 1 && (
+              {items.length > 1 && (
                 <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 sm:gap-4">
-                  {images.map((img, idx) => (
+                  {items.map((item, idx) => (
                     <button
                       key={idx}
-                      onClick={() => setCurrentImageIndex(idx)}
-                      className={`relative aspect-square overflow-hidden rounded-sm transition-all ${currentImageIndex === idx ? 'ring-2 ring-accent ring-offset-2' : 'opacity-70 hover:opacity-100'}`}
+                      onClick={() => setCurrentIndex(idx)}
+                      className={`relative aspect-square overflow-hidden rounded-sm transition-all ${currentIndex === idx ? 'ring-2 ring-accent ring-offset-2' : 'opacity-70 hover:opacity-100'}`}
                     >
-                      <Image 
-                        src={img} 
-                        alt={`Thumbnail ${idx + 1}`}
-                        fill
-                        sizes="(max-width: 768px) 25vw, 10vw"
-                        className="object-cover"
-                      />
+                      {isVideo(item) ? (
+                        <div className="w-full h-full bg-neutral-200 flex items-center justify-center relative">
+                          <video src={item} className="w-full h-full object-cover" />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <div className="w-6 h-6 border-2 border-white rounded-full flex items-center justify-center">
+                              <div className="w-0 h-0 border-l-[6px] border-l-white border-t-[4px] border-t-transparent border-b-[4px] border-b-transparent ml-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <Image 
+                          src={item} 
+                          alt={`Thumbnail ${idx + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 25vw, 10vw"
+                          className="object-cover"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>
