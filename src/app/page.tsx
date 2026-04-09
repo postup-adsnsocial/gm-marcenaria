@@ -10,19 +10,24 @@ import Contact from '../components/Contact';
 import Footer from '../components/Footer';
 import WhatsAppButton from '../components/WhatsAppButton';
 import { Project } from '../types/project';
-import { mockProjects, categories } from '../data/mock';
+import { mockProjects, categories as mockCategories } from '../data/mock';
 import { supabase } from '../lib/supabase';
 import { parseCategories } from '../components/ProjectCard';
+import { fetchCategories } from '../lib/categories';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [allCategories, setAllCategories] = useState<string[]>(mockCategories);
 
   useEffect(() => {
-    async function fetchProjects() {
+    async function loadData() {
       try {
+        const cats = await fetchCategories();
+        setAllCategories(cats);
+
         if (supabase) {
           const { data, error } = await supabase
             .from('projects')
@@ -44,7 +49,7 @@ export default function Home() {
           setFilteredProjects(mockProjects);
         }
       } catch (error) {
-        console.error('Error fetching projects:', error);
+        console.error('Error fetching data:', error);
         setProjects(mockProjects);
         setFilteredProjects(mockProjects);
       } finally {
@@ -52,7 +57,7 @@ export default function Home() {
       }
     }
 
-    fetchProjects();
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -120,7 +125,7 @@ export default function Home() {
                   />
                 )}
               </button>
-              {categories.map((category) => (
+              {allCategories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}

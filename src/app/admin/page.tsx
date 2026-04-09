@@ -9,9 +9,10 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import DeleteButton from '../../components/DeleteButton';
 import { Project } from '../../types/project';
-import { mockProjects, categories } from '../../data/mock';
+import { mockProjects, categories as mockCategories } from '../../data/mock';
 import { supabase } from '../../lib/supabase';
 import { parseImageUrls, isVideo, parseCategories } from '../../components/ProjectCard';
+import { fetchCategories } from '../../lib/categories';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -21,6 +22,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [allCategories, setAllCategories] = useState<string[]>(mockCategories);
   const router = useRouter();
 
   useEffect(() => {
@@ -60,8 +62,14 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAuthenticated) {
       fetchProjects();
+      loadCategories();
     }
   }, [isAuthenticated]);
+
+  const loadCategories = async () => {
+    const cats = await fetchCategories();
+    setAllCategories(cats);
+  };
 
   useEffect(() => {
     let result = projects;
@@ -216,7 +224,7 @@ export default function AdminPage() {
               className="w-full pl-12 pr-10 py-3 bg-white border border-neutral/10 rounded-sm focus:outline-none focus:border-accent/50 transition-all text-sm font-light appearance-none text-secondary cursor-pointer"
             >
               <option value="Todos">Todas as Categorias</option>
-              {categories.map(cat => (
+              {allCategories.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>

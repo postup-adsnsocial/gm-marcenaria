@@ -1,12 +1,13 @@
 "use client";
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Project, ProjectInput } from '../types/project';
-import { categories } from '../data/mock';
-import { Upload, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { categories as mockCategories } from '../data/mock';
+import { Upload, X, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { parseImageUrls, isVideo, parseCategories } from './ProjectCard';
 import { toast } from 'sonner';
+import { fetchCategories, addCategory } from '../lib/categories';
 
 interface AdminProjectFormProps {
   project?: Project | null;
@@ -32,6 +33,18 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
   const [media, setMedia] = useState<MediaItem[]>(initialMedia);
   const [loading, setLoading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
+  
+  const [allCategories, setAllCategories] = useState<string[]>(mockCategories);
+  const [newCategory, setNewCategory] = useState('');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const cats = await fetchCategories();
+      setAllCategories(cats);
+    };
+    loadCategories();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,8 +152,8 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
 
           <div>
             <label className="block text-sm font-medium text-secondary mb-3">Categorias</label>
-            <div className="flex flex-wrap gap-3">
-              {categories.map(cat => (
+            <div className="flex flex-wrap gap-3 mb-4">
+              {allCategories.map(cat => (
                 <button
                   key={cat}
                   type="button"
@@ -154,8 +167,71 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
                   {cat}
                 </button>
               ))}
+              
+              {isAddingCategory ? (
+                <div className="flex items-center gap-2 animate-in fade-in slide-in-from-left-2 duration-300">
+                  <input
+                    type="text"
+                    autoFocus
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    placeholder="Nome da categoria..."
+                    className="px-4 py-2 border border-accent rounded-sm text-sm focus:outline-none w-48"
+                    onKeyDown={async (e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (newCategory.trim()) {
+                          const name = newCategory.trim();
+                          if (!allCategories.includes(name)) {
+                            // Try to save to Supabase
+                            const success = await addCategory(name);
+                            if (success) {
+                              setAllCategories(prev => [...prev, name].sort());
+                              setSelectedCategories(prev => [...prev, name]);
+                              setNewCategory('');
+                              setIsAddingCategory(false);
+                              toast.success('Categoria adicionada!');
+                            } else {
+                              // Local only fallback if DB fails
+                              setAllCategories(prev => [...prev, name].sort());
+                              setSelectedCategories(prev => [...prev, name]);
+                              setNewCategory('');
+                              setIsAddingCategory(false);
+                              toast.info('Categoria adicionada localmente.');
+                            }
+                          } else {
+                            toast.error('Esta categoria já existe');
+                          }
+                        }
+                      } else if (e.key === 'Escape') {
+                        setIsAddingCategory(false);
+                        setNewCategory('');
+                      }
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingCategory(false);
+                      setNewCategory('');
+                    }}
+                    className="p-2 text-neutral hover:text-red-500 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsAddingCategory(true)}
+                  className="px-4 py-2 rounded-sm text-sm font-medium transition-all border border-dashed border-neutral/30 text-neutral/50 hover:border-accent hover:text-accent flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Nova Categoria
+                </button>
+              )}
             </div>
-            <p className="text-[10px] text-neutral/50 mt-2 uppercase tracking-wider">Selecione uma ou mais categorias para o projeto.</p>
+            <p className="text-[10px] text-neutral/50 mt-2 uppercase tracking-wider">Selecione uma ou mais categorias para o projeto ou crie uma nova.</p>
           </div>
 
           <div>
