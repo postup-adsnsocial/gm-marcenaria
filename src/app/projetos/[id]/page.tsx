@@ -11,7 +11,7 @@ import WhatsAppButton from '../../../components/WhatsAppButton';
 import { Project } from '../../../types/project';
 import { mockProjects } from '../../../data/mock';
 import { supabase } from '../../../lib/supabase';
-import { parseImageUrls, isVideo } from '../../../components/ProjectCard';
+import { parseImageUrls, isVideo, parseCategories } from '../../../components/ProjectCard';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 
@@ -171,9 +171,10 @@ export default function ProjectPage() {
 
   const items = parseImageUrls(project.image_url);
   const currentIsVideo = isVideo(items[currentIndex]);
+  const projectCategories = parseCategories(project.category);
 
   const handleWhatsAppClick = () => {
-    const message = encodeURIComponent(`Olá! Gostaria de solicitar um orçamento inspirado no projeto: ${project.title} (${project.category}).`);
+    const message = encodeURIComponent(`Olá! Gostaria de solicitar um orçamento inspirado no projeto: ${project.title} (${projectCategories.join(', ')}).`);
     window.open(`https://wa.me/5541999695577?text=${message}`, '_blank');
   };
 
@@ -348,9 +349,13 @@ export default function ProjectPage() {
               className="flex flex-col justify-center"
             >
               <div className="mb-6">
-                <span className="px-3 py-1 bg-accent/10 text-accent text-xs font-medium tracking-wider uppercase rounded-sm inline-block mb-4">
-                  {project.category}
-                </span>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {projectCategories.map((cat, idx) => (
+                    <span key={idx} className="px-3 py-1 bg-accent/10 text-accent text-xs font-medium tracking-wider uppercase rounded-sm inline-block">
+                      {cat}
+                    </span>
+                  ))}
+                </div>
                 <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-secondary mb-8 leading-tight">
                   {project.title}
                 </h1>

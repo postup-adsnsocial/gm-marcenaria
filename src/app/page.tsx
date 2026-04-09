@@ -12,6 +12,7 @@ import WhatsAppButton from '../components/WhatsAppButton';
 import { Project } from '../types/project';
 import { mockProjects, categories } from '../data/mock';
 import { supabase } from '../lib/supabase';
+import { parseCategories } from '../components/ProjectCard';
 
 export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -58,7 +59,7 @@ export default function Home() {
     if (selectedCategory === 'Todos') {
       setFilteredProjects(projects);
     } else {
-      setFilteredProjects(projects.filter(p => p.category === selectedCategory));
+      setFilteredProjects(projects.filter(p => parseCategories(p.category).includes(selectedCategory)));
     }
   }, [selectedCategory, projects]);
 

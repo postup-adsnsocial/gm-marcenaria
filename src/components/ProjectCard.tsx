@@ -24,6 +24,19 @@ export const parseImageUrls = (urlStr: string): string[] => {
   return [urlStr];
 };
 
+export const parseCategories = (catStr: string): string[] => {
+  if (!catStr) return [];
+  try {
+    const parsed = JSON.parse(catStr);
+    if (Array.isArray(parsed)) return parsed;
+  } catch (e) {
+    if (catStr.includes(',')) {
+      return catStr.split(',').map(s => s.trim()).filter(Boolean);
+    }
+  }
+  return [catStr];
+};
+
 export const isVideo = (url: string): boolean => {
   const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov'];
   return videoExtensions.some(ext => url.toLowerCase().endsWith(ext)) || url.includes('video');
@@ -57,7 +70,8 @@ export default function ProjectCard({ project }: ProjectCardProps) {
 
   const handleWhatsAppClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const message = encodeURIComponent(`Olá! Gostaria de solicitar um orçamento inspirado no projeto: ${project.title} (${project.category}).`);
+    const projectCategories = parseCategories(project.category);
+    const message = encodeURIComponent(`Olá! Gostaria de solicitar um orçamento inspirado no projeto: ${project.title} (${projectCategories.join(', ')}).`);
     window.open(`https://wa.me/5541999695577?text=${message}`, '_blank');
   };
 
@@ -117,7 +131,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         {/* Minimal Category Badge */}
         <div className="absolute top-6 left-6 z-20 pointer-events-none">
           <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-white drop-shadow-md">
-            {project.category}
+            {parseCategories(project.category).join(' • ')}
           </span>
         </div>
 

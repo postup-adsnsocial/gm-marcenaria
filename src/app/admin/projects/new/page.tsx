@@ -47,16 +47,18 @@ export default function NewProjectPage() {
 
   const handleSaveProject = async (data: ProjectInput, files?: File[]) => {
     try {
-      let imageUrls: string[] = [];
-
+      let mediaOrder: string[] = [];
       try {
-        imageUrls = JSON.parse(data.image_url);
+        mediaOrder = JSON.parse(data.image_url);
       } catch {
-        imageUrls = data.image_url ? [data.image_url] : [];
+        mediaOrder = data.image_url ? [data.image_url] : [];
       }
 
+      const finalUrls = [...mediaOrder];
+
       if (files && files.length > 0 && supabase) {
-        const uploadedUrls = await Promise.all(
+        // Upload all files
+        const uploads = await Promise.all(
           files.map(async (file) => {
             const fileExt = file.name.split('.').pop();
             const fileName = `${Math.random()}.${fileExt}`;
@@ -72,15 +74,25 @@ export default function NewProjectPage() {
               .from('project-images')
               .getPublicUrl(filePath);
 
-            return publicUrl;
+            return { originalName: file.name, url: publicUrl };
           })
         );
-        imageUrls = [...imageUrls, ...uploadedUrls];
+
+        // Replace placeholders in finalUrls
+        let fileIndex = 0;
+        for (let i = 0; i < finalUrls.length; i++) {
+          if (finalUrls[i].startsWith('UPLOAD:')) {
+            if (fileIndex < uploads.length) {
+              finalUrls[i] = uploads[fileIndex].url;
+              fileIndex++;
+            }
+          }
+        }
       }
 
       const projectData = {
         ...data,
-        image_url: JSON.stringify(imageUrls),
+        image_url: JSON.stringify(finalUrls.filter(url => !url.startsWith('UPLOAD:'))),
       };
 
       if (supabase) {
@@ -89,7 +101,6 @@ export default function NewProjectPage() {
           .insert([projectData]);
         if (error) throw error;
       } else {
-        // In mock mode, we just pretend it saved
         console.log('Mock save:', projectData);
       }
 
@@ -97,7 +108,7 @@ export default function NewProjectPage() {
       router.push('/admin');
     } catch (error) {
       console.error('Error saving project:', error);
-      toast.error('Erro ao salvar projeto. Verifique o console para mais detalhes.');
+      toast.error('Erro ao salvar projeto.');
     }
   };
 

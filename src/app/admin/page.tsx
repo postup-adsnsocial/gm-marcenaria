@@ -11,7 +11,7 @@ import DeleteButton from '../../components/DeleteButton';
 import { Project } from '../../types/project';
 import { mockProjects, categories } from '../../data/mock';
 import { supabase } from '../../lib/supabase';
-import { parseImageUrls, isVideo } from '../../components/ProjectCard';
+import { parseImageUrls, isVideo, parseCategories } from '../../components/ProjectCard';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -67,7 +67,7 @@ export default function AdminPage() {
     let result = projects;
 
     if (selectedCategory !== 'Todos') {
-      result = result.filter(p => p.category === selectedCategory);
+      result = result.filter(p => parseCategories(p.category).includes(selectedCategory));
     }
 
     if (searchTerm) {
@@ -264,7 +264,7 @@ export default function AdminPage() {
                           {project.title}
                         </Link>
                         <span className="inline-block px-2 py-1 text-[9px] font-bold tracking-widest uppercase text-accent/70 bg-accent/5 rounded-sm mb-2">
-                          {project.category}
+                          {parseCategories(project.category).join(' • ')}
                         </span>
                         <p className="text-xs text-neutral/60 font-light line-clamp-2">
                           {project.description}
@@ -350,7 +350,7 @@ export default function AdminPage() {
                           </td>
                           <td className="px-8 py-6">
                             <span className="text-[10px] font-bold tracking-widest uppercase text-accent/70">
-                              {project.category}
+                              {parseCategories(project.category).join(' • ')}
                             </span>
                           </td>
                           {(userRole === 'admin' || userRole === 'editor') && (

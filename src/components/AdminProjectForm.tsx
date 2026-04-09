@@ -4,8 +4,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { Project, ProjectInput } from '../types/project';
 import { categories } from '../data/mock';
-import { Upload, X } from 'lucide-react';
-import { parseImageUrls, isVideo } from './ProjectCard';
+import { Upload, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { parseImageUrls, isVideo, parseCategories } from './ProjectCard';
 import { toast } from 'sonner';
 
 interface AdminProjectFormProps {
@@ -14,31 +14,48 @@ interface AdminProjectFormProps {
   onCancel: () => void;
 }
 
+type MediaItem = 
+  | { id: string; type: 'url'; value: string }
+  | { id: string; type: 'file'; file: File; preview: string };
+
 export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminProjectFormProps) {
   const [title, setTitle] = useState(project?.title || '');
-  const [category, setCategory] = useState(project?.category || categories[0]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    project ? parseCategories(project.category) : []
+  );
   const [description, setDescription] = useState(project?.description || '');
   
-  const initialUrls = project ? parseImageUrls(project.image_url) : [];
-  const [imageUrls, setImageUrls] = useState<string[]>(initialUrls);
-  const [files, setFiles] = useState<File[]>([]);
-  const [previews, setPreviews] = useState<string[]>([]);
+  const initialMedia: MediaItem[] = project 
+    ? parseImageUrls(project.image_url).map(url => ({ id: Math.random().toString(36).substr(2, 9), type: 'url', value: url }))
+    : [];
   
+  const [media, setMedia] = useState<MediaItem[]>(initialMedia);
   const [loading, setLoading] = useState(false);
   const [urlInput, setUrlInput] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (selectedCategories.length === 0) {
+      toast.error('Selecione pelo menos uma categoria');
+      return;
+    }
     setLoading(true);
     try {
-      // Pass the existing URLs as a JSON string in image_url
-      // The parent component will append the new uploaded files' URLs
+      // Return the media items in the final order
+      // We pass the order information to the parent through the image_url JSON
+      // The parent will process this to upload files and replacement placeholders
+      const existingUrls = media.filter(m => m.type === 'url').map(m => m.value);
+      const newFiles = media.filter(m => m.type === 'file').map(m => m.file);
+      
+      // We also send the full order structure so the parent can reconstruct it
+      const order = media.map(m => m.type === 'url' ? m.value : `UPLOAD:${m.id}`);
+      
       await onSubmit({ 
         title, 
-        category, 
+        category: JSON.stringify(selectedCategories), 
         description, 
-        image_url: JSON.stringify(imageUrls) 
-      }, files);
+        image_url: JSON.stringify(order) // Use the order structure
+      }, newFiles);
     } catch (error) {
       console.error(error);
       toast.error('Erro ao salvar projeto');
@@ -47,17 +64,29 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
     }
   };
 
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(cat) 
+        ? prev.filter(c => c !== cat) 
+        : [...prev, cat]
+    );
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
-      setFiles(prev => [...prev, ...newFiles]);
       
-      // Show previews
       newFiles.forEach(file => {
+        const id = Math.random().toString(36).substr(2, 9);
         const reader = new FileReader();
         reader.onload = (e) => {
           if (e.target?.result) {
-            setPreviews(prev => [...prev, e.target!.result as string]);
+            setMedia(prev => [...prev, { 
+              id, 
+              type: 'file', 
+              file, 
+              preview: e.target!.result as string 
+            }]);
           }
         };
         reader.readAsDataURL(file);
@@ -65,18 +94,26 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
     }
   };
 
-  const removeExistingUrl = (index: number) => {
-    setImageUrls(prev => prev.filter((_, i) => i !== index));
+  const removeItem = (id: string) => {
+    setMedia(prev => prev.filter(m => m.id !== id));
   };
 
-  const removeNewFile = (index: number) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-    setPreviews(prev => prev.filter((_, i) => i !== index));
+  const moveItem = (index: number, direction: 'up' | 'down') => {
+    const newMedia = [...media];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex >= 0 && targetIndex < newMedia.length) {
+      [newMedia[index], newMedia[targetIndex]] = [newMedia[targetIndex], newMedia[index]];
+      setMedia(newMedia);
+    }
   };
 
   const handleAddUrl = () => {
     if (urlInput.trim()) {
-      setImageUrls(prev => [...prev, urlInput.trim()]);
+      setMedia(prev => [...prev, { 
+        id: Math.random().toString(36).substr(2, 9), 
+        type: 'url', 
+        value: urlInput.trim() 
+      }]);
       setUrlInput('');
     }
   };
@@ -101,16 +138,24 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-secondary mb-2">Categoria</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-2 border border-neutral/20 rounded-sm focus:outline-none focus:border-accent bg-white"
-            >
+            <label className="block text-sm font-medium text-secondary mb-3">Categorias</label>
+            <div className="flex flex-wrap gap-3">
               {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => toggleCategory(cat)}
+                  className={`px-4 py-2 rounded-sm text-sm font-medium transition-all border ${
+                    selectedCategories.includes(cat)
+                      ? 'bg-secondary text-white border-secondary'
+                      : 'bg-white text-neutral border-neutral/20 hover:border-accent'
+                  }`}
+                >
+                  {cat}
+                </button>
               ))}
-            </select>
+            </div>
+            <p className="text-[10px] text-neutral/50 mt-2 uppercase tracking-wider">Selecione uma ou mais categorias para o projeto.</p>
           </div>
 
           <div>
@@ -136,50 +181,51 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
             <label className="block text-sm font-medium text-secondary mb-2">Mídias do Projeto (Imagens e Vídeos)</label>
             
             {/* Gallery Preview */}
-            {(imageUrls.length > 0 || previews.length > 0) && (
+            {media.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
-                {imageUrls.map((url, idx) => (
-                  <div key={`url-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-neutral/20 bg-black/5">
-                    {isVideo(url) ? (
-                      <video src={url} className="w-full h-full object-cover" />
-                    ) : (
-                      <Image src={url} alt={`Mídia ${idx + 1}`} fill className="object-cover" />
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => removeExistingUrl(idx)}
-                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
-                      title="Remover"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                    {isVideo(url) && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
-                         <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
-                            <div className="w-0 h-0 border-l-[8px] border-l-white border-t-[5px] border-t-transparent border-b-[5px] border-b-transparent ml-0.5" />
-                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                {previews.map((preview, idx) => {
-                  const isVid = files[idx] ? files[idx].type.startsWith('video/') : isVideo(preview);
+                {media.map((item, idx) => {
+                  const url = item.type === 'url' ? item.value : item.preview;
+                  const isVid = item.type === 'url' ? isVideo(url) : item.file.type.startsWith('video/');
+                  
                   return (
-                    <div key={`file-${idx}`} className="relative aspect-square rounded-sm overflow-hidden group border border-accent/50 bg-black/5">
+                    <div key={item.id} className={`relative aspect-square rounded-sm overflow-hidden group border ${item.type === 'file' ? 'border-accent/50' : 'border-neutral/20'} bg-black/5`}>
                       {isVid ? (
-                        <video src={preview} className="w-full h-full object-cover" />
+                        <video src={url} className="w-full h-full object-cover" />
                       ) : (
-                        <Image src={preview} alt={`Novo item ${idx + 1}`} fill className="object-cover" />
+                        <Image src={url} alt={`Mídia ${idx + 1}`} fill className="object-cover" />
                       )}
-                      <div className="absolute inset-0 bg-accent/10 pointer-events-none" />
-                      <button
-                        type="button"
-                        onClick={() => removeNewFile(idx)}
-                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
-                        title="Remover"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+                      
+                      {item.type === 'file' && <div className="absolute inset-0 bg-accent/10 pointer-events-none" />}
+                      
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <button
+                          type="button"
+                          onClick={() => moveItem(idx, 'up')}
+                          disabled={idx === 0}
+                          className="p-1 bg-white/90 text-secondary rounded-full shadow-sm hover:bg-white disabled:opacity-30"
+                          title="Mover para esquerda"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => moveItem(idx, 'down')}
+                          disabled={idx === media.length - 1}
+                          className="p-1 bg-white/90 text-secondary rounded-full shadow-sm hover:bg-white disabled:opacity-30"
+                          title="Mover para direita"
+                        >
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeItem(item.id)}
+                          className="p-1 bg-red-500 text-white rounded-full shadow-sm hover:bg-red-600 transition-colors"
+                          title="Remover"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      
                       {isVid && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/10 pointer-events-none">
                            <div className="w-8 h-8 border-2 border-white rounded-full flex items-center justify-center">
@@ -241,7 +287,7 @@ export default function AdminProjectForm({ project, onSubmit, onCancel }: AdminP
             </button>
             <button
               type="submit"
-              disabled={loading || (imageUrls.length === 0 && files.length === 0)}
+              disabled={loading || media.length === 0}
               className="px-6 py-2 bg-secondary text-white font-medium rounded-sm hover:bg-secondary/90 transition-colors disabled:opacity-50"
             >
               {loading ? 'Salvando...' : 'Salvar Projeto'}
