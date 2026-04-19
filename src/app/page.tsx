@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
+import HeroParallax from '../components/HeroParallax'
 import Differentials from '../components/Differentials';
 import ProjectCard from '../components/ProjectCard';
 import Contact from '../components/Contact';
@@ -69,9 +69,10 @@ export default function Home() {
   }, [selectedCategory, projects]);
 
   return (
-    <main className="min-h-screen bg-primary">
+      <main className="relative min-h-screen bg-primary">
       <Navbar />
-      <Hero />
+      <HeroParallax/>
+
       
       <div id="diferenciais">
         <Differentials />
