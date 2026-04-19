@@ -43,7 +43,8 @@ export default function Differentials() {
             >
               <span className="font-sans text-[11px] font-bold tracking-[0.3em] uppercase text-accent mb-6 block">Nossa Essência</span>
               <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-secondary leading-[1.1] tracking-tight mb-8">
-                Onde o <span className="italic">design</span> encontra a alma da madeira.
+                Precisão técnica para projetos <span className="italic">sob</span> medida
+                
               </h2>
               <p className="font-sans text-xl text-secondary/70 font-light leading-relaxed max-w-2xl">
                 A GM Marcenaria não apenas fabrica mobiliário; nós esculpimos experiências.
