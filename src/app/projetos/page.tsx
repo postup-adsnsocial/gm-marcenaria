@@ -1,29 +1,28 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'motion/react';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
-import Navbar from '../components/Navbar';
-import HeroParallax from '../components/HeroParallax'
-import Differentials from '../components/Differentials';
-import ProjectCard from '../components/ProjectCard';
-import Contact from '../components/Contact';
-import Footer from '../components/Footer';
-import WhatsAppButton from '../components/WhatsAppButton';
-import { Project } from '../types/project';
-import { mockProjects, categories as mockCategories } from '../data/mock';
-import { supabase } from '../lib/supabase';
-import { parseCategories } from '../components/ProjectCard';
-import { fetchCategories } from '../lib/categories';
+import { ArrowLeft } from 'lucide-react';
+import Navbar from '../../components/Navbar';
+import Footer from '../../components/Footer';
+import WhatsAppButton from '../../components/WhatsAppButton';
+import ProjectCard from '../../components/ProjectCard';
+import { Project } from '../../types/project';
+import { mockProjects, categories as mockCategories } from '../../data/mock';
+import { supabase } from '../../lib/supabase';
+import { parseCategories } from '../../components/ProjectCard';
+import { fetchCategories } from '../../lib/categories';
 
-const PREVIEW_LIMIT = 6;
+function ProjetosContent() {
+  const searchParams = useSearchParams();
+  const initialCategory = searchParams.get('categoria') || 'Todos';
 
-export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Todos');
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [allCategories, setAllCategories] = useState<string[]>(mockCategories);
 
   useEffect(() => {
@@ -71,51 +70,45 @@ export default function Home() {
     }
   }, [selectedCategory, projects]);
 
-  const previewProjects = filteredProjects.slice(0, PREVIEW_LIMIT);
-  const hasMore = filteredProjects.length > PREVIEW_LIMIT;
-  const verTodosHref = selectedCategory === 'Todos'
-    ? '/projetos'
-    : `/projetos?categoria=${encodeURIComponent(selectedCategory)}`;
-
   return (
-      <main className="relative min-h-screen bg-primary">
+    <main className="min-h-screen bg-white flex flex-col">
       <Navbar />
-      <HeroParallax/>
 
-
-      <div id="diferenciais">
-        <Differentials />
-      </div>
-
-      <section id="portfolio" className="py-16 md:py-32 px-4 bg-white">
+      <div className="flex-1 pt-28 md:pt-40 pb-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-20 gap-6">
-            <div className="max-w-2xl">
+
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 md:mb-20 gap-8">
+            <div>
+              <Link
+                href="/#portfolio"
+                className="inline-flex items-center gap-2 text-neutral/50 hover:text-secondary transition-colors mb-8 group"
+              >
+                <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                <span className="text-[11px] font-bold tracking-[0.2em] uppercase">Voltar</span>
+              </Link>
+
               <motion.span
                 initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 className="text-accent text-xs font-semibold tracking-[0.3em] uppercase mb-4 block"
               >
                 Exclusividade & Design
               </motion.span>
-              <motion.h2
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
                 className="font-serif text-4xl md:text-5xl lg:text-6xl text-secondary leading-tight"
               >
-                Portfólio de <br />
-                <span className="italic">Projetos Selecionados</span>
-              </motion.h2>
+                Portfólio <br />
+                <span className="italic">Completo</span>
+              </motion.h1>
             </div>
 
-            {/* Minimalist Category Filter */}
+            {/* Category Filter */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
               className="flex flex-wrap gap-x-8 gap-y-4 border-b border-neutral/10 pb-2"
             >
@@ -130,7 +123,7 @@ export default function Home() {
                 Todos
                 {selectedCategory === 'Todos' && (
                   <motion.div
-                    layoutId="activeTab"
+                    layoutId="activeTabProjetos"
                     className="absolute bottom-[-9px] left-0 right-0 h-0.5 bg-accent"
                   />
                 )}
@@ -148,7 +141,7 @@ export default function Home() {
                   {category}
                   {selectedCategory === category && (
                     <motion.div
-                      layoutId="activeTab"
+                      layoutId="activeTabProjetos"
                       className="absolute bottom-[-9px] left-0 right-0 h-0.5 bg-accent"
                     />
                   )}
@@ -156,6 +149,19 @@ export default function Home() {
               ))}
             </motion.div>
           </div>
+
+          {/* Count */}
+          {!loading && (
+            <motion.p
+              key={selectedCategory}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-[11px] text-neutral/40 uppercase tracking-widest font-medium mb-10"
+            >
+              {filteredProjects.length} {filteredProjects.length === 1 ? 'projeto' : 'projetos'}
+              {selectedCategory !== 'Todos' ? ` em ${selectedCategory}` : ' no total'}
+            </motion.p>
+          )}
 
           {loading ? (
             <div className="flex justify-center items-center h-96">
@@ -171,11 +177,8 @@ export default function Home() {
                 transition={{ duration: 0.35 }}
                 className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-10 gap-y-20"
               >
-                {previewProjects.map((project) => (
-                  <ProjectCard
-                    key={project.id}
-                    project={project}
-                  />
+                {filteredProjects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
                 ))}
               </motion.div>
             </AnimatePresence>
@@ -192,36 +195,27 @@ export default function Home() {
               </p>
             </motion.div>
           )}
-
-          {/* Ver todos CTA */}
-          {!loading && (hasMore || projects.length > 0) && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="mt-20 flex flex-col items-center gap-6"
-            >
-              <div className="w-px h-12 bg-neutral/15" />
-              <Link
-                href={verTodosHref}
-                className="group flex items-center gap-4 px-10 py-4 border border-secondary/20 text-secondary hover:border-secondary hover:bg-secondary hover:text-white transition-all duration-300 rounded-sm"
-              >
-                <span className="text-[11px] font-bold tracking-[0.3em] uppercase">
-                  {hasMore
-                    ? `Ver todos os projetos${selectedCategory !== 'Todos' ? ` de ${selectedCategory}` : ''}`
-                    : 'Ver portfólio completo'}
-                </span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </motion.div>
-          )}
         </div>
-      </section>
+      </div>
 
-      <Contact />
       <Footer />
       <WhatsAppButton />
     </main>
+  );
+}
+
+export default function ProjetosPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-white flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex justify-center items-center">
+          <div className="w-10 h-10 border border-accent/20 border-t-accent rounded-full animate-spin" />
+        </div>
+        <Footer />
+      </main>
+    }>
+      <ProjetosContent />
+    </Suspense>
   );
 }
